@@ -48,6 +48,10 @@
     min-height: 120px;
   }
 
+  .upload-area.dragover {
+    background: #eef6ff;
+  }
+
   select {
     width: 100%;
     padding: 10px;
@@ -139,7 +143,28 @@
 const fileInput = document.getElementById('fileInput');
 const dropZone = document.getElementById('dropZone');
 
+// CLICK TO UPLOAD
 dropZone.addEventListener("click", () => fileInput.click());
+
+// DRAG EVENTS
+dropZone.addEventListener("dragover", (e) => {
+  e.preventDefault();
+  dropZone.classList.add("dragover");
+});
+
+dropZone.addEventListener("dragleave", () => {
+  dropZone.classList.remove("dragover");
+});
+
+dropZone.addEventListener("drop", (e) => {
+  e.preventDefault();
+  dropZone.classList.remove("dragover");
+
+  if (e.dataTransfer.files.length > 0) {
+    fileInput.files = e.dataTransfer.files;
+    showStatus("File selected: " + e.dataTransfer.files[0].name, "success");
+  }
+});
 
 function convertUTCToZone(dateStr, timeStr, zone) {
     let utcDate = new Date(dateStr + "T" + timeStr + "Z");
@@ -159,10 +184,10 @@ function convertUTCToZone(dateStr, timeStr, zone) {
 
     let parts = formatted.split(", ");
 
-    let date = parts[0];
-    let time = parts[1];
-
-    return { date, time };
+    return {
+        date: parts[0],
+        time: parts[1]
+    };
 }
 
 function showStatus(message, type) {
